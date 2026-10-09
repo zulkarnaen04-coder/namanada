@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>KUIS PARANADA - MLBB NOTE CATCHER</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
+    body { background: #0f0c1b; color: #ffffff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+    .cheat-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(230, 57, 70, 0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+    .cheat-warning h1 { font-size: 28px; color: #fff; margin-bottom: 15px; }
+    .cheat-warning button { background: #fff; color: #e63946; font-size: 18px; font-weight: bold; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; }
+
+    .top-header { background: #1a162b; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
+    .student-badge { font-size: 14px; color: #00f0ff; font-weight: bold; text-shadow: 0 0 5px #00f0ff; }
+    .rank-badge { background: linear-gradient(135deg, #7928ca, #ff007f); padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 900; color: #ffe600; text-shadow: 1px 1px 2px #000; border: 1px solid #ffe600; }
+    .score-badge { font-size: 18px; font-weight: 900; color: #ffe600; }
+
+    .game-container { flex: 1; display: flex; flex-direction: row; height: calc(100vh - 50px); }
+    
+    /* LEFT SIDE: STAFF CANVAS */
+    .left-staff { flex: 1.2; position: relative; background: #151221; border-right: 3px solid #7928ca; overflow: hidden; }
+    #staffCanvas { width: 100%; height: 100%; display: block; }
+
+    /* RIGHT SIDE: KEYPAD */
+    .right-keypad { flex: 0.8; background: #0f0c1b; padding: 10px; display: flex; flex-direction: column; justify-content: center; gap: 8px; overflow-y: auto; }
+    .keypad-title { font-size: 12px; text-align: center; color: #00f0ff; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+
+    .note-btn { 
+      background: linear-gradient(180deg, #2d264a, #1a162b); 
+      border: 2px solid #00f0ff; 
+      border-bottom: 4px solid #008088; 
+      border-radius: 10px; 
+      color: #fff; 
+      font-size: 15px; 
+      font-weight: 900; 
+      padding: 10px 5px; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 0 12px; 
+      height: 42px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      transition: all 0.08s ease;
+    }
+    .note-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+    .note-btn.wrong-tap { background: linear-gradient(180deg, #ef4444, #dc2626) !important; border-color: #f87171 !important; border-bottom: 4px solid #b91c1c !important; }
+    .note-btn.correct-tap { background: linear-gradient(180deg, #10b981, #059669) !important; border-color: #34d399 !important; border-bottom: 4px solid #047857 !important; }
+
+    .start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #2d264a 0%, #0f0c1b 100%); z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+    .start-title { color: #00f0ff; font-size: 26px; font-weight: 900; margin-bottom: 6px; text-transform: uppercase; text-shadow: 0 0 15px #00f0ff; }
+    .start-subtitle { color: #ff007f; font-size: 15px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+    .student-form { background: #1a162b; border: 3px solid #ff007f; padding: 15px; border-radius: 16px; width: 100%; max-width: 320px; margin-bottom: 15px; text-align: left; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 12px; color: #ffe600; font-weight: bold; margin-bottom: 4px; }
+    .form-group input { width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: 2px solid #7928ca; background: #0f0c1b; color: #fff; outline: none; }
+    
+    .start-btn { background: linear-gradient(135deg, #00f0ff, #7928ca); color: #fff; font-size: 18px; font-weight: 900; padding: 12px 30px; border: 2px solid #fff; border-radius: 30px; cursor: pointer; box-shadow: 0 0 15px rgba(0, 240, 255, 0.6); width: 100%; max-width: 320px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <div class="cheat-warning" id="cheat-screen">
+    <h1 id="cheat-title">PERINGATAN CURANG!</h1>
+    <p id="cheat-msg">Terdeteksi meninggalkan aplikasi / membuka tab lain!</p>
+    <button id="resume-cheat-btn" onclick="resumeQuiz()">LANJUTKAN</button>
+  </div>
+
+  <div class="start-screen" id="start-screen">
+    <div class="start-title">ZULKARNAEN</div>
+    <div class="start-subtitle">🎵 MLBB PARANADA NOTE CATCHER 🎵</div>
+    
+    <div class="student-form">
+      <div class="form-group">
+        <label for="student-name">Nama Lengkap Murid:</label>
+        <input type="text" id="student-name" placeholder="Masukkan nama..." autocomplete="off">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="student-class">Kelas:</label>
+        <input type="text" id="student-class" placeholder="Contoh: 7.1" autocomplete="off">
+      </div>
+    </div>
+
+    <div style="background:#1a162b; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
+      <strong style="color:#ffe600;">CARA BERMAIN:</strong>
+      <ul style="margin-left:15px; margin-top:4px; color:#e2e8f0;">
+        <li>Not berjalan Santai/Pelan dari kiri ke kanan.</li>
+        <li>Tap tombol nada saat not pas di <strong>Lingkaran Hit-Zone Target</strong>.</li>
+        <li>Kumpulkan Skor untuk naik Rank dari <strong>Warrior</strong> sampai <strong>Mythic</strong>!</li>
+      </ul>
+    </div>
+    <button class="start-btn" onclick="validateAndStart()">START GAME 🚀</button>
+  </div>
+
+  <div class="top-header">
+    <div class="student-badge" id="display-student">Siswa: -</div>
+    <div class="rank-badge" id="rank-badge">RANK: UNRANKED</div>
+    <div class="score-badge" id="score-badge">SKOR: 0</div>
+  </div>
+
+  <div class="game-container">
+    <div class="left-staff">
+      <canvas id="staffCanvas"></canvas>
+    </div>
+
+    <div class="right-keypad" id="keypad-container">
+      <div class="keypad-title">TAP NADA SEJAJAR</div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtR4A3opjRjcFkqsulOgKEAJpw3c6xt3fWlpKvPv45sMtNbVLYskAjxAa621ZEyURC/exec";
+
+    let audioCtx = null;
+    let canvas, ctx;
+    let studentName = "", studentClass = "";
+    let score = 0, currentRank = "UNRANKED";
+    let cheatCount = 0, MAX_CHEATS = 3;
+    let isDataSent = false, gameRunning = false;
+
+    // FREKUENSI DAN POSISI NOT BALOK DI PARANADA KUNCI G
+    // Y-Offset disesuaikan dari C4 (paling bawah dengan garis bantu) ke C6 (paling atas)
+    const NOTES_DATA = [
+      { id: "C4", name: "C (Do Rendah)", freq: 261.63, step: 0 },
+      { id: "D4", name: "D (Re)", freq: 293.66, step: 1 },
+      { id: "E4", name: "E (Mi)", freq: 329.63, step: 2 },
+      { id: "F4", name: "F (Fa)", freq: 349.23, step: 3 },
+      { id: "G4", name: "G (Sol)", freq: 392.00, step: 4 },
+      { id: "A4", name: "A (La)", freq: 440.00, step: 5 },
+      { id: "B4", name: "B (Si)", freq: 493.88, step: 6 },
+      { id: "C5", name: "C (Do Tinggi)", freq: 523.25, step: 7 },
+      { id: "D5", name: "D (Re Tinggi)", freq: 587.33, step: 8 },
+      { id: "E5", name: "E (Mi Tinggi)", freq: 659.25, step: 9 },
+      { id: "F5", name: "F (Fa Tinggi)", freq: 698.46, step: 10 },
+      { id: "G5", name: "G (Sol Tinggi)", freq: 783.99, step: 11 }
+    ];
+
+    let activeNotes = [];
+    let lastSpawnTime = 0;
+    const SPAWN_INTERVAL = 3200; // Jeda antar not (ms)
+    const NOTE_SPEED = 1.1; // KECEPATAN SANGAT SLOW & SANTAI
+    let hitZoneX = 0;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playNoteTone(freq) {
+      initAudioContext();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.8);
+    }
+
+    function playWrongSFX() {
+      initAudioContext();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(130, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+
+    // HITUNG RANK BERDASARKAN SKOR MLBB
+    function calculateRank(sc) {
+      if (sc < 5) return "UNRANKED";
+      if (sc <= 40) return "WARRIOR ⚔️";
+      if (sc <= 80) return "ELITE 🛡️";
+      if (sc <= 120) return "MASTER ⚔️✨";
+      if (sc <= 160) return "GRANDMASTER 👑";
+      if (sc <= 200) return "EPIC 💎";
+      if (sc <= 250) return "LEGEND 🦅";
+      return "MYTHIC 🌟🔥";
+    }
+
+    function updateRankAndScoreUI() {
+      currentRank = calculateRank(score);
+      document.getElementById("score-badge").innerText = "SKOR: " + score;
+      document.getElementById("rank-badge").innerText = "RANK: " + currentRank;
+    }
+
+    function renderKeypad() {
+      const keypad = document.getElementById("keypad-container");
+      keypad.innerHTML = '<div class="keypad-title">TAP NADA SEJAJAR</div>';
+
+      NOTES_DATA.slice().reverse().forEach(n => {
+        const btn = document.createElement("button");
+        btn.className = "note-btn";
+        btn.id = "btn-" + n.id;
+        btn.innerHTML = `<span>${n.name}</span><span style="font-size:11px; color:#ffe600;">${n.id}</span>`;
+        btn.onclick = () => handleTapNote(n, btn);
+        keypad.appendChild(btn);
+      });
+    }
+
+    function handleTapNote(noteObj, btnElem) {
+      if (!gameRunning) return;
+
+      // Cari not aktif tercekat yang berada dekat Hit Zone Target
+      let hitIndex = activeNotes.findIndex(n => {
+        return n.noteData.id === noteObj.id && Math.abs(n.x - hitZoneX) < 45;
+      });
+
+      if (hitIndex !== -1) {
+        // BENAR
+        score += 5;
+        updateRankAndScoreUI();
+        playNoteTone(noteObj.freq);
+        activeNotes[hitIndex].status = "hit";
+        
+        btnElem.classList.add("correct-tap");
+        setTimeout(() => btnElem.classList.remove("correct-tap"), 250);
+      } else {
+        // SALAH -> HANYA WARNA MERAH TANPA MENUNJUKKAN KUNCI HIJAU
+        playWrongSFX();
+        btnElem.classList.add("wrong-tap");
+        setTimeout(() => btnElem.classList.remove("wrong-tap"), 300);
+      }
+    }
+
+    function spawnNote() {
+      const randomData = NOTES_DATA[Math.floor(Math.random() * NOTES_DATA.length)];
+      activeNotes.push({
+        noteData: randomData,
+        x: -30,
+        status: "active" // "active", "hit", "missed"
+      });
+    }
+
+    function initCanvas() {
+      canvas = document.getElementById("staffCanvas");
+      ctx = canvas.getContext("2d");
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      hitZoneX = canvas.width * 0.75; // Posisi Lingkaran Hit Zone
+    }
+
+    function drawStaff() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const lineSpacing = 16;
+      const centerY = canvas.height / 2;
+      const staffTop = centerY - (lineSpacing * 2);
+
+      // Gambar 5 Garis Paranada
+      ctx.strokeStyle = "#ffe600";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        let y = staffTop + (i * lineSpacing);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Gambar Kunci G Sederhana
+      ctx.fillStyle = "#ff007f";
+      ctx.font = "bold 38px sans-serif";
+      ctx.fillText("🎼", 10, centerY + 12);
+
+      // Gambar Lingkaran Target Hit Zone
+      ctx.strokeStyle = "#00f0ff";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.arc(hitZoneX, centerY, 28, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#00f0ff";
+      ctx.font = "10px sans-serif";
+      ctx.fillText("TARGET TAP", hitZoneX - 28, centerY + 42);
+
+      // Gambar Not Balok yang Sedang Berjalan
+      const now = performance.now();
+      if (now - lastSpawnTime > SPAWN_INTERVAL) {
+        spawnNote();
+        lastSpawnTime = now;
+      }
+
+      for (let i = activeNotes.length - 1; i >= 0; i--) {
+        let n = activeNotes[i];
+        n.x += NOTE_SPEED; // Kecepatan lambat & santai
+
+        // Hitung Y berdasarkan Step Not
+        let noteY = (staffTop + (lineSpacing * 4)) - (n.noteData.step * (lineSpacing / 2));
+
+        if (n.status === "active") {
+          // Gambar Not Balok 2 Ketuk (Lingkaran Putih dengan Garis Tangkai)
+          ctx.strokeStyle = "#ffffff";
+          ctx.fillStyle = "#151221";
+          ctx.lineWidth = 3;
+          
+          ctx.beginPath();
+          ctx.arc(n.x, noteY, 9, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Garis Tangkai Not
+          ctx.beginPath();
+          ctx.moveTo(n.x + 8, noteY);
+          ctx.lineTo(n.x + 8, noteY - 25);
+          ctx.stroke();
+
+          // Garis Bantu Tambahan (misal C4 / A5 ke atas)
+          if (n.noteData.step === 0) { // C4
+            ctx.beginPath();
+            ctx.moveTo(n.x - 14, noteY);
+            ctx.lineTo(n.x + 14, noteY);
+            ctx.stroke();
+          }
+
+          // Cek Jika Melewati Hit Zone Tanpa Di-tap
+          if (n.x > hitZoneX + 50) {
+            n.status = "missed";
+          }
+        } else if (n.status === "hit") {
+          // Efek Kena -> Lingkaran Hijau
+          ctx.fillStyle = "#10b981";
+          ctx.beginPath();
+          ctx.arc(n.x, noteY, 12, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Hapus not yang sudah lewat keluar layar
+        if (n.x > canvas.width + 30) {
+          activeNotes.splice(i, 1);
+        }
+      }
+
+      if (gameRunning) {
+        requestAnimationFrame(drawStaff);
+      }
+    }
+
+    function validateAndStart() {
+      var nameInput = document.getElementById("student-name").value.trim();
+      var classInput = document.getElementById("student-class").value.trim();
+      if (nameInput === "" || classInput === "") {
+        alert("Harap isi Nama Lengkap dan Kelas terlebih dahulu!");
+        return;
+      }
+      studentName = nameInput;
+      studentClass = classInput;
+      document.getElementById("display-student").innerText = "Siswa: " + studentName + " (" + studentClass + ")";
+      
+      initAudioContext();
+      renderKeypad();
+      document.getElementById("start-screen").style.display = "none";
+      
+      gameRunning = true;
+      lastSpawnTime = performance.now();
+      drawStaff();
+    }
+
+    // ANTI-CHEAT DETEKSI TAB/WINDOW
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden && gameRunning) handleCheatViolation("Terdeteksi meninggalkan tab!");
+    });
+
+    window.addEventListener("blur", function() {
+      if (gameRunning) handleCheatViolation("Terdeteksi keluar dari aplikasi!");
+    });
+
+    function handleCheatViolation(reason) {
+      if (isDataSent) return;
+      cheatCount++;
+      gameRunning = false;
+      var cheatScreen = document.getElementById("cheat-screen");
+
+      if (cheatCount >= MAX_CHEATS) {
+        document.getElementById("cheat-title").innerText = "DISKUALIFIKASI!";
+        document.getElementById("cheat-msg").innerText = "3x Pelanggaran! Game dihentikan dan data tercatat.";
+        document.getElementById("resume-cheat-btn").style.display = "none";
+        cheatScreen.style.display = "flex";
+        sendDataToGoogleSheets();
+      } else {
+        document.getElementById("cheat-title").innerText = `PERINGATAN CURANG (${cheatCount}/${MAX_CHEATS})`;
+        document.getElementById("cheat-msg").innerText = reason;
+        cheatScreen.style.display = "flex";
+      }
+    }
+
+    function resumeQuiz() {
+      document.getElementById("cheat-screen").style.display = "none";
+      gameRunning = true;
+      lastSpawnTime = performance.now();
+      drawStaff();
+    }
+
+    function sendDataToGoogleSheets(useBeacon = false) {
+      if (isDataSent || studentName === "") return;
+      isDataSent = true;
+
+      var formData = new URLSearchParams();
+      formData.append("timestamp", new Date().toLocaleString("id-ID"));
+      formData.append("nama", studentName);
+      formData.append("kelas", studentClass);
+      formData.append("skor", score);
+      formData.append("rank", currentRank);
+      formData.append("pelanggaran", cheatCount);
+
+      if (SCRIPT_URL && SCRIPT_URL.indexOf("AKfycb") !== -1) {
+        if (useBeacon && navigator.sendBeacon) {
+          navigator.sendBeacon(SCRIPT_URL, formData);
+        } else {
+          fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+          }).catch(err => console.error("Gagal kirim data:", err));
+        }
+      }
+    }
+
+    window.addEventListener("beforeunload", () => sendDataToGoogleSheets(true));
+    window.onload = initCanvas;
+  </script>
+</body>
+</html>
