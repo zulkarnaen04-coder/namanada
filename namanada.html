@@ -16,6 +16,7 @@
     .top-header { background: #161224; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
     .student-badge { font-size: 13px; color: #00f0ff; font-weight: bold; text-shadow: 0 0 5px #00f0ff; }
     .status-group { display: flex; align-items: center; gap: 8px; }
+    .timer-badge { background: #2d1b4e; color: #ff007f; border: 1.5px solid #ff007f; padding: 3px 8px; border-radius: 10px; font-size: 13px; font-weight: 900; box-shadow: 0 0 5px rgba(255,0,127,0.3); }
     .wrong-counter { background: #282142; color: #f87171; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
     .rank-badge { background: linear-gradient(135deg, #7928ca, #ff007f); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 900; color: #ffe600; text-shadow: 1px 1px 2px #000; border: 1px solid #ffe600; }
     .score-badge { font-size: 16px; font-weight: 900; color: #ffe600; }
@@ -86,11 +87,12 @@
     </div>
 
     <div style="background:#161224; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
-      <strong style="color:#ffe600;">STANDAR TEORI MUSIK & ATURAN SKOR:</strong>
+      <strong style="color:#ffe600;">STANDAR TEORI MUSIK & ATURAN GAME:</strong>
       <ul style="margin-left:15px; margin-top:4px; color:#e2e8f0;">
-        <li>Posisi Garis & Spasi akurat 100% sesuai teori musik Kunci G.</li>
+        <li>Posisi Garis & Spasi Kunci G standar internasional.</li>
+        <li>⏱️ <strong>Batas Waktu:</strong> 30 Menit bermain.</li>
         <li>Benar tap = <strong>+5 Poin</strong>.</li>
-        <li><strong>Sistem Penalti:</strong> Tiap 3x salah tap = <strong>Skor berkurang -5 Poin</strong> & Rank MLBB bisa turun!</li>
+        <li>Tiap 3x salah tap = <strong>Skor -5 Poin</strong> & Rank MLBB bisa turun!</li>
       </ul>
     </div>
     <button class="start-btn" onclick="validateAndStart()">START GAME 🚀</button>
@@ -99,6 +101,7 @@
   <div class="top-header">
     <div class="student-badge" id="display-student">Siswa: -</div>
     <div class="status-group">
+      <div class="timer-badge" id="timer-badge">⏱️ 30:00</div>
       <div class="wrong-counter" id="wrong-counter">Salah Tap: 0/3</div>
       <div class="rank-badge" id="rank-badge">RANK: UNRANKED</div>
       <div class="score-badge" id="score-badge">SKOR: 0</div>
@@ -122,9 +125,13 @@
     let canvas, ctx;
     let studentName = "", studentClass = "";
     let score = 0, currentRank = "UNRANKED";
-    let consecutiveWrongTaps = 0; // Penghitung salah tap berturut-turut
+    let consecutiveWrongTaps = 0;
     let cheatCount = 0, MAX_CHEATS = 3;
     let isDataSent = false, gameRunning = false;
+
+    // TIMER 30 MENIT (1800 DETIK)
+    let totalTimeSeconds = 1800;
+    let gameTimerInterval = null;
 
     const KEYPAD_BUTTONS = [
       { baseNote: "C", label: "C (Do)", freqLow: 261.63, freqHigh: 523.25 },
@@ -221,6 +228,27 @@
       document.getElementById("wrong-counter").innerText = `Salah Tap: ${consecutiveWrongTaps}/3`;
     }
 
+    function start30MinTimer() {
+      updateTimerUI();
+      gameTimerInterval = setInterval(() => {
+        if (!gameRunning) return;
+        totalTimeSeconds--;
+        updateTimerUI();
+
+        if (totalTimeSeconds <= 0) {
+          clearInterval(gameTimerInterval);
+          finishGameByTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      let m = Math.floor(totalTimeSeconds / 60);
+      let s = totalTimeSeconds % 60;
+      let timeStr = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      document.getElementById("timer-badge").innerText = "⏱️ " + timeStr;
+    }
+
     function renderKeypad() {
       const keypad = document.getElementById("keypad-container");
       keypad.innerHTML = '<div class="keypad-title">TAP NADA</div>';
@@ -243,9 +271,8 @@
       });
 
       if (hitIndex !== -1) {
-        // JAWABAN BENAR -> SKOR BERTAMBAH +5 & PENALTI DINETRALKAN
         score += 5;
-        consecutiveWrongTaps = 0; // Reset hitungan salah tap
+        consecutiveWrongTaps = 0;
         updateRankAndScoreUI();
         
         playNoteTone(activeNotes[hitIndex].noteData.freq);
@@ -254,14 +281,12 @@
         btnElem.classList.add("correct-tap");
         setTimeout(() => btnElem.classList.remove("correct-tap"), 250);
       } else {
-        // JAWABAN SALAH
         playWrongSFX();
         consecutiveWrongTaps++;
 
-        // JIKA SALAH 3 KALI -> SKOR BERKURANG -5 (RANK BISA TURUN)
         if (consecutiveWrongTaps >= 3) {
-          score = Math.max(0, score - 5); // Skor berkurang 5 (tidak kurang dari 0)
-          consecutiveWrongTaps = 0; // Reset penghitung setelah penalti diterapkan
+          score = Math.max(0, score - 5);
+          consecutiveWrongTaps = 0;
         }
 
         updateRankAndScoreUI();
@@ -294,25 +319,40 @@
       hitZoneX = canvas.width * 0.80;
     }
 
+    // GAMBAR KUNCI G STANDAR AKURAT ALA COMPLETE MUSIC READING TRAINER
     function drawTrebleClef(ctx, x, lineSpacing, line1Y) {
       ctx.save();
       ctx.strokeStyle = "#ff007f";
       ctx.fillStyle = "#ff007f";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.8;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
 
-      const line2Y = line1Y - lineSpacing;
+      const line2Y = line1Y - lineSpacing; // Garis G (Garis 2)
+      const line4Y = line1Y - (lineSpacing * 3);
 
       ctx.beginPath();
-      ctx.arc(x + 14, line2Y, 10, 0.2 * Math.PI, 1.8 * Math.PI, false);
-      ctx.bezierCurveTo(x + 28, line2Y - 32, x + 8, line1Y - (lineSpacing * 5), x + 10, line1Y - (lineSpacing * 6));
-      ctx.bezierCurveTo(x + 12, line1Y - (lineSpacing * 7), x + 20, line1Y - (lineSpacing * 5), x + 15, line1Y - (lineSpacing * 3.5));
-      ctx.lineTo(x + 12, line1Y + 22);
-      ctx.arc(x + 6, line1Y + 22, 6, 0, Math.PI, false);
+      // 1. Bulatan Awal di Garis 2 (G4)
+      ctx.arc(x + 16, line2Y, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Melingkar searah jarum jam mengelilingi Garis 2
+      ctx.moveTo(x + 16, line2Y);
+      ctx.bezierCurveTo(x + 28, line2Y - 14, x + 20, line1Y, x + 11, line1Y - (lineSpacing * 0.5));
+      ctx.bezierCurveTo(x + 2, line1Y - lineSpacing, x + 4, line2Y - 16, x + 15, line4Y);
+
+      // 3. Melintasi ke atas membentuk simpul di atas Garis 5
+      ctx.bezierCurveTo(x + 26, line1Y - (lineSpacing * 4.8), x + 16, line1Y - (lineSpacing * 6.2), x + 12, line1Y - (lineSpacing * 5.2));
+      
+      // 4. Meluncur tegak lurus ke bawah memotong paranada
+      ctx.bezierCurveTo(x + 8, line1Y - (lineSpacing * 4.2), x + 11, line1Y + lineSpacing, x + 11, line1Y + (lineSpacing * 1.5));
+
+      // 5. Ekor melengkung kiri bawah dengan bulatan akhir
+      ctx.arc(x + 6, line1Y + (lineSpacing * 1.5), 5, 0, Math.PI, false);
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(x + 14, line2Y, 3, 0, Math.PI * 2);
-      ctx.arc(x + 6, line1Y + 22, 3, 0, Math.PI * 2);
+      ctx.arc(x + 6, line1Y + (lineSpacing * 1.5), 3, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
@@ -425,6 +465,7 @@
       
       gameRunning = true;
       lastSpawnTime = performance.now();
+      start30MinTimer();
       drawStaff();
     }
 
@@ -460,6 +501,26 @@
       gameRunning = true;
       lastSpawnTime = performance.now();
       drawStaff();
+    }
+
+    function finishGameByTimeout() {
+      gameRunning = false;
+      sendDataToGoogleSheets();
+      
+      document.body.innerHTML = `
+        <div style="min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#0b0914; color:#fff; text-align:center; padding:20px;">
+          <h1 style="color:#ffe600; font-size:28px; margin-bottom:15px; text-transform:uppercase; text-shadow:0 0 10px #ffe600;">WAKTU 30 MENIT HABIS! ⏱️</h1>
+          <p style="color:#00f0ff; font-size:15px; margin-bottom:20px;">Sesi latihan telah selesai. Data skor telah terkirim otomatis ke Google Sheets.</p>
+          <div style="background:#161224; border:3px solid #ff007f; padding:20px; border-radius:20px; width:100%; max-width:340px; margin-bottom:20px; text-align:left; box-shadow:0 0 20px rgba(255,0,127,0.3);">
+            <p style="font-size:15px; margin-bottom:8px; color:#00f0ff;">Nama: <strong>${studentName}</strong></p>
+            <p style="font-size:15px; margin-bottom:15px; color:#00f0ff;">Kelas: <strong>${studentClass}</strong></p>
+            <hr style="border:0; border-top:1px solid #7928ca; margin-bottom:15px;">
+            <p style="font-size:18px; margin-bottom:8px; color:#ffe600;">RANK MLBB: <strong>${currentRank}</strong></p>
+            <p style="font-size:26px; font-weight:900; color:#00f0ff; margin-top:10px;">SKOR AKHIR: ${score}</p>
+          </div>
+          <button onclick="location.reload()" style="background:linear-gradient(135deg, #00f0ff, #7928ca); color:#fff; font-size:18px; font-weight:bold; padding:12px 35px; border:2px solid #fff; border-radius:30px; cursor:pointer;">MAIN LAGI 🔄</button>
+        </div>
+      `;
     }
 
     function sendDataToGoogleSheets(useBeacon = false) {
