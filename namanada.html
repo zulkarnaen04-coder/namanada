@@ -4,58 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>KUIS PARANADA - MLBB NOTE CATCHER</title>
+  <title>COMPLETE READING TRAINER - MLBB EDITION</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
-    body { background: #0f0c1b; color: #ffffff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+    body { background: #0b0914; color: #ffffff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
     .cheat-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(230, 57, 70, 0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
     .cheat-warning h1 { font-size: 28px; color: #fff; margin-bottom: 15px; }
     .cheat-warning button { background: #fff; color: #e63946; font-size: 18px; font-weight: bold; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; }
 
-    .top-header { background: #1a162b; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
+    .top-header { background: #161224; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
     .student-badge { font-size: 14px; color: #00f0ff; font-weight: bold; text-shadow: 0 0 5px #00f0ff; }
     .rank-badge { background: linear-gradient(135deg, #7928ca, #ff007f); padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 900; color: #ffe600; text-shadow: 1px 1px 2px #000; border: 1px solid #ffe600; }
     .score-badge { font-size: 18px; font-weight: 900; color: #ffe600; }
 
     .game-container { flex: 1; display: flex; flex-direction: row; height: calc(100vh - 50px); }
     
-    /* LEFT SIDE: LAYAR PARANADA DIPERBESAR (75%) */
-    .left-staff { flex: 3; position: relative; background: #151221; border-right: 3px solid #7928ca; overflow: hidden; }
+    /* LEFT SIDE: DISPLAY LAYAR PARANADA (75%) */
+    .left-staff { flex: 3; position: relative; background: #120e20; border-right: 3px solid #7928ca; overflow: hidden; }
     #staffCanvas { width: 100%; height: 100%; display: block; }
 
-    /* RIGHT SIDE: KEYPAD DIPERSEMPIT (25%) */
-    .right-keypad { flex: 1; background: #0f0c1b; padding: 8px; display: flex; flex-direction: column; justify-content: center; gap: 5px; overflow-y: auto; }
-    .keypad-title { font-size: 11px; text-align: center; color: #00f0ff; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px; }
+    /* RIGHT SIDE: KEYPAD TIPE COMPLETE READING TRAINER (25%) */
+    .right-keypad { flex: 1; background: #0b0914; padding: 10px; display: flex; flex-direction: column; justify-content: center; gap: 8px; overflow-y: auto; }
+    .keypad-title { font-size: 11px; text-align: center; color: #00f0ff; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
 
     .note-btn { 
-      background: linear-gradient(180deg, #2d264a, #1a162b); 
+      background: linear-gradient(180deg, #282142, #161224); 
       border: 2px solid #00f0ff; 
-      border-bottom: 3px solid #008088; 
-      border-radius: 8px; 
+      border-bottom: 4px solid #008088; 
+      border-radius: 10px; 
       color: #fff; 
-      font-size: 13px; 
+      font-size: 16px; 
       font-weight: 900; 
       cursor: pointer; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      padding: 0 8px; 
-      height: 36px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      padding: 0 12px; 
+      height: 44px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.5);
       transition: all 0.08s ease;
     }
-    .note-btn:active { transform: translateY(2px); border-bottom-width: 1px; }
-    .note-btn.wrong-tap { background: linear-gradient(180deg, #ef4444, #dc2626) !important; border-color: #f87171 !important; border-bottom: 3px solid #b91c1c !important; }
-    .note-btn.correct-tap { background: linear-gradient(180deg, #10b981, #059669) !important; border-color: #34d399 !important; border-bottom: 3px solid #047857 !important; }
+    .note-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+    .note-btn.wrong-tap { background: linear-gradient(180deg, #ef4444, #dc2626) !important; border-color: #f87171 !important; border-bottom: 4px solid #b91c1c !important; }
+    .note-btn.correct-tap { background: linear-gradient(180deg, #10b981, #059669) !important; border-color: #34d399 !important; border-bottom: 4px solid #047857 !important; }
 
-    .start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #2d264a 0%, #0f0c1b 100%); z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+    .start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #282142 0%, #0b0914 100%); z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
     .start-title { color: #00f0ff; font-size: 26px; font-weight: 900; margin-bottom: 6px; text-transform: uppercase; text-shadow: 0 0 15px #00f0ff; }
-    .start-subtitle { color: #ff007f; font-size: 15px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
-    .student-form { background: #1a162b; border: 3px solid #ff007f; padding: 15px; border-radius: 16px; width: 100%; max-width: 320px; margin-bottom: 15px; text-align: left; }
+    .start-subtitle { color: #ff007f; font-size: 14px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+    .student-form { background: #161224; border: 3px solid #ff007f; padding: 15px; border-radius: 16px; width: 100%; max-width: 320px; margin-bottom: 15px; text-align: left; }
     .form-group { margin-bottom: 10px; }
     .form-group label { display: block; font-size: 12px; color: #ffe600; font-weight: bold; margin-bottom: 4px; }
-    .form-group input { width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: 2px solid #7928ca; background: #0f0c1b; color: #fff; outline: none; }
+    .form-group input { width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: 2px solid #7928ca; background: #0b0914; color: #fff; outline: none; }
     
     .start-btn { background: linear-gradient(135deg, #00f0ff, #7928ca); color: #fff; font-size: 18px; font-weight: 900; padding: 12px 30px; border: 2px solid #fff; border-radius: 30px; cursor: pointer; box-shadow: 0 0 15px rgba(0, 240, 255, 0.6); width: 100%; max-width: 320px; text-transform: uppercase; }
   </style>
@@ -70,7 +70,7 @@
 
   <div class="start-screen" id="start-screen">
     <div class="start-title">ZULKARNAEN</div>
-    <div class="start-subtitle">🎵 MLBB PARANADA NOTE CATCHER 🎵</div>
+    <div class="start-subtitle">🎵 MUSIC READING TRAINER (KUNCI G) 🎵</div>
     
     <div class="student-form">
       <div class="form-group">
@@ -83,12 +83,12 @@
       </div>
     </div>
 
-    <div style="background:#1a162b; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
-      <strong style="color:#ffe600;">CARA BERMAIN:</strong>
+    <div style="background:#161224; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
+      <strong style="color:#ffe600;">STANDAR TEORI MUSIK:</strong>
       <ul style="margin-left:15px; margin-top:4px; color:#e2e8f0;">
-        <li>Not berjalan <strong>SANGAT PELAN</strong> melintasi paranada Kunci G.</li>
-        <li>Tap tombol nada di kanan saat not pas di <strong>Lingkaran Target</strong>.</li>
-        <li>Kumpulkan Skor untuk naik Rank dari <strong>Warrior</strong> sampai <strong>Mythic</strong>!</li>
+        <li>Posisi Garis & Spasi akurat 100% sesuai teori musik Kunci G.</li>
+        <li>Tap tombol nada (C, D, E, F, G, A, B) saat not tiba di <strong>Target Hit Zone</strong>.</li>
+        <li>Dapatkan Skor untuk capai Rank <strong>Warrior</strong> hingga <strong>Mythic</strong>!</li>
       </ul>
     </div>
     <button class="start-btn" onclick="validateAndStart()">START GAME 🚀</button>
@@ -120,25 +120,38 @@
     let cheatCount = 0, MAX_CHEATS = 3;
     let isDataSent = false, gameRunning = false;
 
+    // TOMBOL INPUT DENGAN 7 NADA UTAMA ALA COMPLETE MUSIC READING TRAINER
+    const KEYPAD_BUTTONS = [
+      { baseNote: "C", label: "C (Do)", freqLow: 261.63, freqHigh: 523.25 },
+      { baseNote: "D", label: "D (Re)", freqLow: 293.66, freqHigh: 587.33 },
+      { baseNote: "E", label: "E (Mi)", freqLow: 329.63, freqHigh: 659.25 },
+      { baseNote: "F", label: "F (Fa)", freqLow: 349.23, freqHigh: 698.46 },
+      { baseNote: "G", label: "G (Sol)", freqLow: 392.00, freqHigh: 783.99 },
+      { baseNote: "A", label: "A (La)", freqLow: 440.00, freqHigh: 880.00 },
+      { baseNote: "B", label: "B (Si)", freqLow: 493.88, freqHigh: 987.77 }
+    ];
+
+    // PEMETAAN NOT BALOK DENGAN TEORI MUSIK PARANADA KUNCI G
+    // indexFromBottomLine: 0 = Garis 1 (E4), 1 = Spasi 1 (F4), 2 = Garis 2 (G4), dst.
     const NOTES_DATA = [
-      { id: "C4", name: "C (Do Rendah)", freq: 261.63, step: 0 },
-      { id: "D4", name: "D (Re)", freq: 293.66, step: 1 },
-      { id: "E4", name: "E (Mi)", freq: 329.63, step: 2 },
-      { id: "F4", name: "F (Fa)", freq: 349.23, step: 3 },
-      { id: "G4", name: "G (Sol)", freq: 392.00, step: 4 },
-      { id: "A4", name: "A (La)", freq: 440.00, step: 5 },
-      { id: "B4", name: "B (Si)", freq: 493.88, step: 6 },
-      { id: "C5", name: "C (Do Tinggi)", freq: 523.25, step: 7 },
-      { id: "D5", name: "D (Re Tinggi)", freq: 587.33, step: 8 },
-      { id: "E5", name: "E (Mi Tinggi)", freq: 659.25, step: 9 },
-      { id: "F5", name: "F (Fa Tinggi)", freq: 698.46, step: 10 },
-      { id: "G5", name: "G (Sol Tinggi)", freq: 783.99, step: 11 }
+      { id: "C4", baseNote: "C", freq: 261.63, indexFromBottomLine: -2 }, // Garis bantu bawah
+      { id: "D4", baseNote: "D", freq: 293.66, indexFromBottomLine: -1 }, // Tepat di bawah Garis 1
+      { id: "E4", baseNote: "E", freq: 329.63, indexFromBottomLine: 0 },  // Garis 1
+      { id: "F4", baseNote: "F", freq: 349.23, indexFromBottomLine: 1 },  // Spasi 1
+      { id: "G4", baseNote: "G", freq: 392.00, indexFromBottomLine: 2 },  // Garis 2
+      { id: "A4", baseNote: "A", freq: 440.00, indexFromBottomLine: 3 },  // Spasi 2
+      { id: "B4", baseNote: "B", freq: 493.88, indexFromBottomLine: 4 },  // Garis 3
+      { id: "C5", baseNote: "C", freq: 523.25, indexFromBottomLine: 5 },  // Spasi 3
+      { id: "D5", baseNote: "D", freq: 587.33, indexFromBottomLine: 6 },  // Garis 4
+      { id: "E5", baseNote: "E", freq: 659.25, indexFromBottomLine: 7 },  // Spasi 4
+      { id: "F5", baseNote: "F", freq: 698.46, indexFromBottomLine: 8 },  // Garis 5
+      { id: "G5", baseNote: "G", freq: 783.99, indexFromBottomLine: 9 }   // Di atas Garis 5
     ];
 
     let activeNotes = [];
     let lastSpawnTime = 0;
-    const SPAWN_INTERVAL = 4500; // Jeda antar not (4.5 detik)
-    const NOTE_SPEED = 0.45; // KECEPATAN SANGAT LAMBAT & SANTAI
+    const SPAWN_INTERVAL = 4200; // Jeda 4.2 detik
+    const NOTE_SPEED = 0.45; // Kecepatan gerak pelan & santai
     let hitZoneX = 0;
 
     function initAudioContext() {
@@ -206,34 +219,37 @@
 
     function renderKeypad() {
       const keypad = document.getElementById("keypad-container");
-      keypad.innerHTML = '<div class="keypad-title">TAP NADA</div>';
+      keypad.innerHTML = '<div class="keypad-title">TAP NADA SEJAJAR</div>';
 
-      NOTES_DATA.slice().reverse().forEach(n => {
+      KEYPAD_BUTTONS.forEach(btnInfo => {
         const btn = document.createElement("button");
         btn.className = "note-btn";
-        btn.id = "btn-" + n.id;
-        btn.innerHTML = `<span>${n.name}</span><span style="font-size:10px; color:#ffe600;">${n.id}</span>`;
-        btn.onclick = () => handleTapNote(n, btn);
+        btn.id = "btn-" + btnInfo.baseNote;
+        btn.innerHTML = `<span>${btnInfo.label}</span><span style="font-size:12px; color:#ffe600;">${btnInfo.baseNote}</span>`;
+        btn.onclick = () => handleTapNote(btnInfo, btn);
         keypad.appendChild(btn);
       });
     }
 
-    function handleTapNote(noteObj, btnElem) {
+    function handleTapNote(btnInfo, btnElem) {
       if (!gameRunning) return;
 
+      // Cek apakah ada not dengan nama dasar yang sesuai di dalam Target Hit Zone
       let hitIndex = activeNotes.findIndex(n => {
-        return n.noteData.id === noteObj.id && Math.abs(n.x - hitZoneX) < 50;
+        return n.noteData.baseNote === btnInfo.baseNote && Math.abs(n.x - hitZoneX) < 50;
       });
 
       if (hitIndex !== -1) {
+        // JAWABAN BENAR
         score += 5;
         updateRankAndScoreUI();
-        playNoteTone(noteObj.freq);
+        playNoteTone(activeNotes[hitIndex].noteData.freq);
         activeNotes[hitIndex].status = "hit";
         
         btnElem.classList.add("correct-tap");
         setTimeout(() => btnElem.classList.remove("correct-tap"), 250);
       } else {
+        // JAWABAN SALAH -> TAMPILKAN WARNA MERAH TANPA MEMBOCORKAN KUNCI JAWABAN
         playWrongSFX();
         btnElem.classList.add("wrong-tap");
         setTimeout(() => btnElem.classList.remove("wrong-tap"), 300);
@@ -260,35 +276,33 @@
       const parent = canvas.parentElement;
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
-      hitZoneX = canvas.width * 0.80; // Target Lingkaran di 80% Lebar Layar
+      hitZoneX = canvas.width * 0.80;
     }
 
-    // GAMBAR KUNCI G STANDAR INTERNASIONAL (VEKTOR PRESISI)
-    function drawTrebleClef(ctx, x, lineSpacing, staffTop) {
+    // GAMBAR KUNCI G STANDAR INTERNASIONAL PRESISI TEORI MUSIK
+    function drawTrebleClef(ctx, x, lineSpacing, line1Y) {
       ctx.save();
       ctx.strokeStyle = "#ff007f";
       ctx.fillStyle = "#ff007f";
       ctx.lineWidth = 2.5;
 
-      // Posisi dasar Kunci G berpusat di garis ke-2 (G4)
-      const line2Y = staffTop + (lineSpacing * 3); 
+      const line2Y = line1Y - lineSpacing; // Garis 2 (G4)
 
       ctx.beginPath();
-      // Melingkar di Garis G (Garis kedua dari bawah)
-      ctx.arc(x + 14, line2Y - 3, 11, 0.2 * Math.PI, 1.8 * Math.PI, false);
-      // Naik memanjang ke atas paranada
-      ctx.bezierCurveTo(x + 30, line2Y - 35, x + 8, staffTop - 35, x + 10, staffTop - 45);
-      ctx.bezierCurveTo(x + 12, staffTop - 55, x + 20, staffTop - 40, x + 15, staffTop - 20);
-      // Turun lurus melewati dasar paranada
-      ctx.lineTo(x + 12, line2Y + 30);
-      // Ekor melengkung bawah
-      ctx.arc(x + 6, line2Y + 30, 6, 0, Math.PI, false);
+      // Melingkar melintasi Garis G (Garis 2)
+      ctx.arc(x + 14, line2Y, 10, 0.2 * Math.PI, 1.8 * Math.PI, false);
+      // Lengkungan naik melepasi Garis 5
+      ctx.bezierCurveTo(x + 28, line2Y - 32, x + 8, line1Y - (lineSpacing * 5), x + 10, line1Y - (lineSpacing * 6));
+      ctx.bezierCurveTo(x + 12, line1Y - (lineSpacing * 7), x + 20, line1Y - (lineSpacing * 5), x + 15, line1Y - (lineSpacing * 3.5));
+      // Turun tegak lurus melewati Garis 1
+      ctx.lineTo(x + 12, line1Y + 22);
+      ctx.arc(x + 6, line1Y + 22, 6, 0, Math.PI, false);
       ctx.stroke();
 
       // Titik bulatan kepala Kunci G
       ctx.beginPath();
-      ctx.arc(x + 14, line2Y - 3, 3, 0, Math.PI * 2);
-      ctx.arc(x + 6, line2Y + 30, 3, 0, Math.PI * 2);
+      ctx.arc(x + 14, line2Y, 3, 0, Math.PI * 2);
+      ctx.arc(x + 6, line1Y + 22, 3, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
@@ -297,23 +311,25 @@
     function drawStaff() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const lineSpacing = 18;
+      const lineSpacing = 18; // Jarak antar garis (1 spasi)
       const centerY = canvas.height / 2;
-      const staffTop = centerY - (lineSpacing * 2);
+      
+      // Garis 1 (paling bawah) berada 2 spasi di bawah titik tengah
+      const line1Y = centerY + (lineSpacing * 2);
 
-      // Gambar 5 Garis Paranada
+      // Gambar 5 Garis Paranada Standar (Garis 1 ke Garis 5)
       ctx.strokeStyle = "#ffe600";
       ctx.lineWidth = 2;
       for (let i = 0; i < 5; i++) {
-        let y = staffTop + (i * lineSpacing);
+        let y = line1Y - (i * lineSpacing);
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(canvas.width, y);
         ctx.stroke();
       }
 
-      // GAMBAR KUNCI G STANDAR INTERNASIONAL
-      drawTrebleClef(ctx, 15, lineSpacing, staffTop);
+      // Gambar Kunci G Standar Internasional pada Garis 2
+      drawTrebleClef(ctx, 15, lineSpacing, line1Y);
 
       // Gambar Lingkaran Target Hit Zone
       ctx.strokeStyle = "#00f0ff";
@@ -328,7 +344,7 @@
       ctx.font = "bold 11px sans-serif";
       ctx.fillText("TARGET TAP", hitZoneX - 32, centerY + 46);
 
-      // Gambar Not Balok yang Sedang Berjalan
+      // Logika Spawn & Animasi Not Balok
       const now = performance.now();
       if (now - lastSpawnTime > SPAWN_INTERVAL) {
         spawnNote();
@@ -339,27 +355,34 @@
         let n = activeNotes[i];
         n.x += NOTE_SPEED;
 
-        let noteY = (staffTop + (lineSpacing * 4)) - (n.noteData.step * (lineSpacing / 2));
+        // RUMUS AKURAT TEORI MUSIK:
+        // Y = Line1Y - (indexFromBottomLine * (lineSpacing / 2))
+        let noteY = line1Y - (n.noteData.indexFromBottomLine * (lineSpacing / 2));
 
         if (n.status === "active") {
-          // Not Balok 2 Ketuk (Lingkaran Putih + Tangkai)
+          // Gambar Not Balok 2 Ketuk (Lingkaran Putih Transparan + Tangkai)
           ctx.strokeStyle = "#ffffff";
-          ctx.fillStyle = "#151221";
+          ctx.fillStyle = "#120e20";
           ctx.lineWidth = 3;
           
           ctx.beginPath();
-          ctx.arc(n.x, noteY, 10, 0, Math.PI * 2);
+          ctx.arc(n.x, noteY, 9, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
 
-          // Garis Tangkai
+          // Garis Tangkai Not (Tangkai ke atas jika di bawah Garis 3, tangkai ke bawah jika di atas Garis 3)
           ctx.beginPath();
-          ctx.moveTo(n.x + 9, noteY);
-          ctx.lineTo(n.x + 9, noteY - 28);
+          if (n.noteData.indexFromBottomLine >= 4) {
+            ctx.moveTo(n.x - 8, noteY);
+            ctx.lineTo(n.x - 8, noteY + 28);
+          } else {
+            ctx.moveTo(n.x + 8, noteY);
+            ctx.lineTo(n.x + 8, noteY - 28);
+          }
           ctx.stroke();
 
-          // Garis Bantu Tambahan (C4)
-          if (n.noteData.step === 0) {
+          // Garis Bantu Tambahan (Ledger Line untuk C4 / Do Rendah)
+          if (n.noteData.id === "C4") {
             ctx.beginPath();
             ctx.moveTo(n.x - 16, noteY);
             ctx.lineTo(n.x + 16, noteY);
@@ -372,7 +395,7 @@
         } else if (n.status === "hit") {
           ctx.fillStyle = "#10b981";
           ctx.beginPath();
-          ctx.arc(n.x, noteY, 13, 0, Math.PI * 2);
+          ctx.arc(n.x, noteY, 12, 0, Math.PI * 2);
           ctx.fill();
         }
 
