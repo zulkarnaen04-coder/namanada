@@ -13,10 +13,12 @@
     .cheat-warning h1 { font-size: 28px; color: #fff; margin-bottom: 15px; }
     .cheat-warning button { background: #fff; color: #e63946; font-size: 18px; font-weight: bold; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; }
 
-    .top-header { background: #161224; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
-    .student-badge { font-size: 14px; color: #00f0ff; font-weight: bold; text-shadow: 0 0 5px #00f0ff; }
-    .rank-badge { background: linear-gradient(135deg, #7928ca, #ff007f); padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 900; color: #ffe600; text-shadow: 1px 1px 2px #000; border: 1px solid #ffe600; }
-    .score-badge { font-size: 18px; font-weight: 900; color: #ffe600; }
+    .top-header { background: #161224; height: 50px; border-bottom: 3px solid #ff007f; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
+    .student-badge { font-size: 13px; color: #00f0ff; font-weight: bold; text-shadow: 0 0 5px #00f0ff; }
+    .status-group { display: flex; align-items: center; gap: 8px; }
+    .wrong-counter { background: #282142; color: #f87171; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+    .rank-badge { background: linear-gradient(135deg, #7928ca, #ff007f); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 900; color: #ffe600; text-shadow: 1px 1px 2px #000; border: 1px solid #ffe600; }
+    .score-badge { font-size: 16px; font-weight: 900; color: #ffe600; }
 
     .game-container { flex: 1; display: flex; flex-direction: row; height: calc(100vh - 50px); }
     
@@ -84,11 +86,11 @@
     </div>
 
     <div style="background:#161224; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
-      <strong style="color:#ffe600;">STANDAR TEORI MUSIK:</strong>
+      <strong style="color:#ffe600;">STANDAR TEORI MUSIK & ATURAN SKOR:</strong>
       <ul style="margin-left:15px; margin-top:4px; color:#e2e8f0;">
         <li>Posisi Garis & Spasi akurat 100% sesuai teori musik Kunci G.</li>
-        <li>Tap tombol nada (C, D, E, F, G, A, B) saat not tiba di <strong>Target Hit Zone</strong>.</li>
-        <li>Dapatkan Skor untuk capai Rank <strong>Warrior</strong> hingga <strong>Mythic</strong>!</li>
+        <li>Benar tap = <strong>+5 Poin</strong>.</li>
+        <li><strong>Sistem Penalti:</strong> Tiap 3x salah tap = <strong>Skor berkurang -5 Poin</strong> & Rank MLBB bisa turun!</li>
       </ul>
     </div>
     <button class="start-btn" onclick="validateAndStart()">START GAME 🚀</button>
@@ -96,8 +98,11 @@
 
   <div class="top-header">
     <div class="student-badge" id="display-student">Siswa: -</div>
-    <div class="rank-badge" id="rank-badge">RANK: UNRANKED</div>
-    <div class="score-badge" id="score-badge">SKOR: 0</div>
+    <div class="status-group">
+      <div class="wrong-counter" id="wrong-counter">Salah Tap: 0/3</div>
+      <div class="rank-badge" id="rank-badge">RANK: UNRANKED</div>
+      <div class="score-badge" id="score-badge">SKOR: 0</div>
+    </div>
   </div>
 
   <div class="game-container">
@@ -117,10 +122,10 @@
     let canvas, ctx;
     let studentName = "", studentClass = "";
     let score = 0, currentRank = "UNRANKED";
+    let consecutiveWrongTaps = 0; // Penghitung salah tap berturut-turut
     let cheatCount = 0, MAX_CHEATS = 3;
     let isDataSent = false, gameRunning = false;
 
-    // TOMBOL INPUT DENGAN 7 NADA UTAMA ALA COMPLETE MUSIC READING TRAINER
     const KEYPAD_BUTTONS = [
       { baseNote: "C", label: "C (Do)", freqLow: 261.63, freqHigh: 523.25 },
       { baseNote: "D", label: "D (Re)", freqLow: 293.66, freqHigh: 587.33 },
@@ -131,27 +136,25 @@
       { baseNote: "B", label: "B (Si)", freqLow: 493.88, freqHigh: 987.77 }
     ];
 
-    // PEMETAAN NOT BALOK DENGAN TEORI MUSIK PARANADA KUNCI G
-    // indexFromBottomLine: 0 = Garis 1 (E4), 1 = Spasi 1 (F4), 2 = Garis 2 (G4), dst.
     const NOTES_DATA = [
-      { id: "C4", baseNote: "C", freq: 261.63, indexFromBottomLine: -2 }, // Garis bantu bawah
-      { id: "D4", baseNote: "D", freq: 293.66, indexFromBottomLine: -1 }, // Tepat di bawah Garis 1
-      { id: "E4", baseNote: "E", freq: 329.63, indexFromBottomLine: 0 },  // Garis 1
-      { id: "F4", baseNote: "F", freq: 349.23, indexFromBottomLine: 1 },  // Spasi 1
-      { id: "G4", baseNote: "G", freq: 392.00, indexFromBottomLine: 2 },  // Garis 2
-      { id: "A4", baseNote: "A", freq: 440.00, indexFromBottomLine: 3 },  // Spasi 2
-      { id: "B4", baseNote: "B", freq: 493.88, indexFromBottomLine: 4 },  // Garis 3
-      { id: "C5", baseNote: "C", freq: 523.25, indexFromBottomLine: 5 },  // Spasi 3
-      { id: "D5", baseNote: "D", freq: 587.33, indexFromBottomLine: 6 },  // Garis 4
-      { id: "E5", baseNote: "E", freq: 659.25, indexFromBottomLine: 7 },  // Spasi 4
-      { id: "F5", baseNote: "F", freq: 698.46, indexFromBottomLine: 8 },  // Garis 5
-      { id: "G5", baseNote: "G", freq: 783.99, indexFromBottomLine: 9 }   // Di atas Garis 5
+      { id: "C4", baseNote: "C", freq: 261.63, indexFromBottomLine: -2 },
+      { id: "D4", baseNote: "D", freq: 293.66, indexFromBottomLine: -1 },
+      { id: "E4", baseNote: "E", freq: 329.63, indexFromBottomLine: 0 },
+      { id: "F4", baseNote: "F", freq: 349.23, indexFromBottomLine: 1 },
+      { id: "G4", baseNote: "G", freq: 392.00, indexFromBottomLine: 2 },
+      { id: "A4", baseNote: "A", freq: 440.00, indexFromBottomLine: 3 },
+      { id: "B4", baseNote: "B", freq: 493.88, indexFromBottomLine: 4 },
+      { id: "C5", baseNote: "C", freq: 523.25, indexFromBottomLine: 5 },
+      { id: "D5", baseNote: "D", freq: 587.33, indexFromBottomLine: 6 },
+      { id: "E5", baseNote: "E", freq: 659.25, indexFromBottomLine: 7 },
+      { id: "F5", baseNote: "F", freq: 698.46, indexFromBottomLine: 8 },
+      { id: "G5", baseNote: "G", freq: 783.99, indexFromBottomLine: 9 }
     ];
 
     let activeNotes = [];
     let lastSpawnTime = 0;
-    const SPAWN_INTERVAL = 4200; // Jeda 4.2 detik
-    const NOTE_SPEED = 0.45; // Kecepatan gerak pelan & santai
+    const SPAWN_INTERVAL = 4200;
+    const NOTE_SPEED = 0.45;
     let hitZoneX = 0;
 
     function initAudioContext() {
@@ -215,11 +218,12 @@
       currentRank = calculateRank(score);
       document.getElementById("score-badge").innerText = "SKOR: " + score;
       document.getElementById("rank-badge").innerText = "RANK: " + currentRank;
+      document.getElementById("wrong-counter").innerText = `Salah Tap: ${consecutiveWrongTaps}/3`;
     }
 
     function renderKeypad() {
       const keypad = document.getElementById("keypad-container");
-      keypad.innerHTML = '<div class="keypad-title">TAP NADA SEJAJAR</div>';
+      keypad.innerHTML = '<div class="keypad-title">TAP NADA</div>';
 
       KEYPAD_BUTTONS.forEach(btnInfo => {
         const btn = document.createElement("button");
@@ -234,23 +238,34 @@
     function handleTapNote(btnInfo, btnElem) {
       if (!gameRunning) return;
 
-      // Cek apakah ada not dengan nama dasar yang sesuai di dalam Target Hit Zone
       let hitIndex = activeNotes.findIndex(n => {
         return n.noteData.baseNote === btnInfo.baseNote && Math.abs(n.x - hitZoneX) < 50;
       });
 
       if (hitIndex !== -1) {
-        // JAWABAN BENAR
+        // JAWABAN BENAR -> SKOR BERTAMBAH +5 & PENALTI DINETRALKAN
         score += 5;
+        consecutiveWrongTaps = 0; // Reset hitungan salah tap
         updateRankAndScoreUI();
+        
         playNoteTone(activeNotes[hitIndex].noteData.freq);
         activeNotes[hitIndex].status = "hit";
         
         btnElem.classList.add("correct-tap");
         setTimeout(() => btnElem.classList.remove("correct-tap"), 250);
       } else {
-        // JAWABAN SALAH -> TAMPILKAN WARNA MERAH TANPA MEMBOCORKAN KUNCI JAWABAN
+        // JAWABAN SALAH
         playWrongSFX();
+        consecutiveWrongTaps++;
+
+        // JIKA SALAH 3 KALI -> SKOR BERKURANG -5 (RANK BISA TURUN)
+        if (consecutiveWrongTaps >= 3) {
+          score = Math.max(0, score - 5); // Skor berkurang 5 (tidak kurang dari 0)
+          consecutiveWrongTaps = 0; // Reset penghitung setelah penalti diterapkan
+        }
+
+        updateRankAndScoreUI();
+
         btnElem.classList.add("wrong-tap");
         setTimeout(() => btnElem.classList.remove("wrong-tap"), 300);
       }
@@ -279,27 +294,22 @@
       hitZoneX = canvas.width * 0.80;
     }
 
-    // GAMBAR KUNCI G STANDAR INTERNASIONAL PRESISI TEORI MUSIK
     function drawTrebleClef(ctx, x, lineSpacing, line1Y) {
       ctx.save();
       ctx.strokeStyle = "#ff007f";
       ctx.fillStyle = "#ff007f";
       ctx.lineWidth = 2.5;
 
-      const line2Y = line1Y - lineSpacing; // Garis 2 (G4)
+      const line2Y = line1Y - lineSpacing;
 
       ctx.beginPath();
-      // Melingkar melintasi Garis G (Garis 2)
       ctx.arc(x + 14, line2Y, 10, 0.2 * Math.PI, 1.8 * Math.PI, false);
-      // Lengkungan naik melepasi Garis 5
       ctx.bezierCurveTo(x + 28, line2Y - 32, x + 8, line1Y - (lineSpacing * 5), x + 10, line1Y - (lineSpacing * 6));
       ctx.bezierCurveTo(x + 12, line1Y - (lineSpacing * 7), x + 20, line1Y - (lineSpacing * 5), x + 15, line1Y - (lineSpacing * 3.5));
-      // Turun tegak lurus melewati Garis 1
       ctx.lineTo(x + 12, line1Y + 22);
       ctx.arc(x + 6, line1Y + 22, 6, 0, Math.PI, false);
       ctx.stroke();
 
-      // Titik bulatan kepala Kunci G
       ctx.beginPath();
       ctx.arc(x + 14, line2Y, 3, 0, Math.PI * 2);
       ctx.arc(x + 6, line1Y + 22, 3, 0, Math.PI * 2);
@@ -311,13 +321,10 @@
     function drawStaff() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const lineSpacing = 18; // Jarak antar garis (1 spasi)
+      const lineSpacing = 18;
       const centerY = canvas.height / 2;
-      
-      // Garis 1 (paling bawah) berada 2 spasi di bawah titik tengah
       const line1Y = centerY + (lineSpacing * 2);
 
-      // Gambar 5 Garis Paranada Standar (Garis 1 ke Garis 5)
       ctx.strokeStyle = "#ffe600";
       ctx.lineWidth = 2;
       for (let i = 0; i < 5; i++) {
@@ -328,10 +335,8 @@
         ctx.stroke();
       }
 
-      // Gambar Kunci G Standar Internasional pada Garis 2
       drawTrebleClef(ctx, 15, lineSpacing, line1Y);
 
-      // Gambar Lingkaran Target Hit Zone
       ctx.strokeStyle = "#00f0ff";
       ctx.lineWidth = 3;
       ctx.setLineDash([6, 4]);
@@ -344,7 +349,6 @@
       ctx.font = "bold 11px sans-serif";
       ctx.fillText("TARGET TAP", hitZoneX - 32, centerY + 46);
 
-      // Logika Spawn & Animasi Not Balok
       const now = performance.now();
       if (now - lastSpawnTime > SPAWN_INTERVAL) {
         spawnNote();
@@ -355,12 +359,9 @@
         let n = activeNotes[i];
         n.x += NOTE_SPEED;
 
-        // RUMUS AKURAT TEORI MUSIK:
-        // Y = Line1Y - (indexFromBottomLine * (lineSpacing / 2))
         let noteY = line1Y - (n.noteData.indexFromBottomLine * (lineSpacing / 2));
 
         if (n.status === "active") {
-          // Gambar Not Balok 2 Ketuk (Lingkaran Putih Transparan + Tangkai)
           ctx.strokeStyle = "#ffffff";
           ctx.fillStyle = "#120e20";
           ctx.lineWidth = 3;
@@ -370,7 +371,6 @@
           ctx.fill();
           ctx.stroke();
 
-          // Garis Tangkai Not (Tangkai ke atas jika di bawah Garis 3, tangkai ke bawah jika di atas Garis 3)
           ctx.beginPath();
           if (n.noteData.indexFromBottomLine >= 4) {
             ctx.moveTo(n.x - 8, noteY);
@@ -381,7 +381,6 @@
           }
           ctx.stroke();
 
-          // Garis Bantu Tambahan (Ledger Line untuk C4 / Do Rendah)
           if (n.noteData.id === "C4") {
             ctx.beginPath();
             ctx.moveTo(n.x - 16, noteY);
