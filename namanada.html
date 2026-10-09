@@ -20,35 +20,34 @@
 
     .game-container { flex: 1; display: flex; flex-direction: row; height: calc(100vh - 50px); }
     
-    /* LEFT SIDE: STAFF CANVAS */
-    .left-staff { flex: 1.2; position: relative; background: #151221; border-right: 3px solid #7928ca; overflow: hidden; }
+    /* LEFT SIDE: LAYAR PARANADA DIPERBESAR (75%) */
+    .left-staff { flex: 3; position: relative; background: #151221; border-right: 3px solid #7928ca; overflow: hidden; }
     #staffCanvas { width: 100%; height: 100%; display: block; }
 
-    /* RIGHT SIDE: KEYPAD */
-    .right-keypad { flex: 0.8; background: #0f0c1b; padding: 10px; display: flex; flex-direction: column; justify-content: center; gap: 8px; overflow-y: auto; }
-    .keypad-title { font-size: 12px; text-align: center; color: #00f0ff; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+    /* RIGHT SIDE: KEYPAD DIPERSEMPIT (25%) */
+    .right-keypad { flex: 1; background: #0f0c1b; padding: 8px; display: flex; flex-direction: column; justify-content: center; gap: 5px; overflow-y: auto; }
+    .keypad-title { font-size: 11px; text-align: center; color: #00f0ff; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px; }
 
     .note-btn { 
       background: linear-gradient(180deg, #2d264a, #1a162b); 
       border: 2px solid #00f0ff; 
-      border-bottom: 4px solid #008088; 
-      border-radius: 10px; 
+      border-bottom: 3px solid #008088; 
+      border-radius: 8px; 
       color: #fff; 
-      font-size: 15px; 
+      font-size: 13px; 
       font-weight: 900; 
-      padding: 10px 5px; 
       cursor: pointer; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      padding: 0 12px; 
-      height: 42px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      padding: 0 8px; 
+      height: 36px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
       transition: all 0.08s ease;
     }
-    .note-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
-    .note-btn.wrong-tap { background: linear-gradient(180deg, #ef4444, #dc2626) !important; border-color: #f87171 !important; border-bottom: 4px solid #b91c1c !important; }
-    .note-btn.correct-tap { background: linear-gradient(180deg, #10b981, #059669) !important; border-color: #34d399 !important; border-bottom: 4px solid #047857 !important; }
+    .note-btn:active { transform: translateY(2px); border-bottom-width: 1px; }
+    .note-btn.wrong-tap { background: linear-gradient(180deg, #ef4444, #dc2626) !important; border-color: #f87171 !important; border-bottom: 3px solid #b91c1c !important; }
+    .note-btn.correct-tap { background: linear-gradient(180deg, #10b981, #059669) !important; border-color: #34d399 !important; border-bottom: 3px solid #047857 !important; }
 
     .start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #2d264a 0%, #0f0c1b 100%); z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
     .start-title { color: #00f0ff; font-size: 26px; font-weight: 900; margin-bottom: 6px; text-transform: uppercase; text-shadow: 0 0 15px #00f0ff; }
@@ -87,8 +86,8 @@
     <div style="background:#1a162b; border:2px solid #7928ca; padding:10px; border-radius:10px; font-size:11px; margin-bottom:15px; width:100%; max-width:320px; text-align:left;">
       <strong style="color:#ffe600;">CARA BERMAIN:</strong>
       <ul style="margin-left:15px; margin-top:4px; color:#e2e8f0;">
-        <li>Not berjalan Santai/Pelan dari kiri ke kanan.</li>
-        <li>Tap tombol nada saat not pas di <strong>Lingkaran Hit-Zone Target</strong>.</li>
+        <li>Not berjalan <strong>SANGAT PELAN</strong> melintasi paranada Kunci G.</li>
+        <li>Tap tombol nada di kanan saat not pas di <strong>Lingkaran Target</strong>.</li>
         <li>Kumpulkan Skor untuk naik Rank dari <strong>Warrior</strong> sampai <strong>Mythic</strong>!</li>
       </ul>
     </div>
@@ -107,7 +106,7 @@
     </div>
 
     <div class="right-keypad" id="keypad-container">
-      <div class="keypad-title">TAP NADA SEJAJAR</div>
+      <div class="keypad-title">TAP NADA</div>
     </div>
   </div>
 
@@ -121,8 +120,6 @@
     let cheatCount = 0, MAX_CHEATS = 3;
     let isDataSent = false, gameRunning = false;
 
-    // FREKUENSI DAN POSISI NOT BALOK DI PARANADA KUNCI G
-    // Y-Offset disesuaikan dari C4 (paling bawah dengan garis bantu) ke C6 (paling atas)
     const NOTES_DATA = [
       { id: "C4", name: "C (Do Rendah)", freq: 261.63, step: 0 },
       { id: "D4", name: "D (Re)", freq: 293.66, step: 1 },
@@ -140,8 +137,8 @@
 
     let activeNotes = [];
     let lastSpawnTime = 0;
-    const SPAWN_INTERVAL = 3200; // Jeda antar not (ms)
-    const NOTE_SPEED = 1.1; // KECEPATAN SANGAT SLOW & SANTAI
+    const SPAWN_INTERVAL = 4500; // Jeda antar not (4.5 detik)
+    const NOTE_SPEED = 0.45; // KECEPATAN SANGAT LAMBAT & SANTAI
     let hitZoneX = 0;
 
     function initAudioContext() {
@@ -190,7 +187,6 @@
       osc.stop(now + 0.25);
     }
 
-    // HITUNG RANK BERDASARKAN SKOR MLBB
     function calculateRank(sc) {
       if (sc < 5) return "UNRANKED";
       if (sc <= 40) return "WARRIOR ⚔️";
@@ -210,13 +206,13 @@
 
     function renderKeypad() {
       const keypad = document.getElementById("keypad-container");
-      keypad.innerHTML = '<div class="keypad-title">TAP NADA SEJAJAR</div>';
+      keypad.innerHTML = '<div class="keypad-title">TAP NADA</div>';
 
       NOTES_DATA.slice().reverse().forEach(n => {
         const btn = document.createElement("button");
         btn.className = "note-btn";
         btn.id = "btn-" + n.id;
-        btn.innerHTML = `<span>${n.name}</span><span style="font-size:11px; color:#ffe600;">${n.id}</span>`;
+        btn.innerHTML = `<span>${n.name}</span><span style="font-size:10px; color:#ffe600;">${n.id}</span>`;
         btn.onclick = () => handleTapNote(n, btn);
         keypad.appendChild(btn);
       });
@@ -225,13 +221,11 @@
     function handleTapNote(noteObj, btnElem) {
       if (!gameRunning) return;
 
-      // Cari not aktif tercekat yang berada dekat Hit Zone Target
       let hitIndex = activeNotes.findIndex(n => {
-        return n.noteData.id === noteObj.id && Math.abs(n.x - hitZoneX) < 45;
+        return n.noteData.id === noteObj.id && Math.abs(n.x - hitZoneX) < 50;
       });
 
       if (hitIndex !== -1) {
-        // BENAR
         score += 5;
         updateRankAndScoreUI();
         playNoteTone(noteObj.freq);
@@ -240,7 +234,6 @@
         btnElem.classList.add("correct-tap");
         setTimeout(() => btnElem.classList.remove("correct-tap"), 250);
       } else {
-        // SALAH -> HANYA WARNA MERAH TANPA MENUNJUKKAN KUNCI HIJAU
         playWrongSFX();
         btnElem.classList.add("wrong-tap");
         setTimeout(() => btnElem.classList.remove("wrong-tap"), 300);
@@ -252,7 +245,7 @@
       activeNotes.push({
         noteData: randomData,
         x: -30,
-        status: "active" // "active", "hit", "missed"
+        status: "active"
       });
     }
 
@@ -267,13 +260,44 @@
       const parent = canvas.parentElement;
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
-      hitZoneX = canvas.width * 0.75; // Posisi Lingkaran Hit Zone
+      hitZoneX = canvas.width * 0.80; // Target Lingkaran di 80% Lebar Layar
+    }
+
+    // GAMBAR KUNCI G STANDAR INTERNASIONAL (VEKTOR PRESISI)
+    function drawTrebleClef(ctx, x, lineSpacing, staffTop) {
+      ctx.save();
+      ctx.strokeStyle = "#ff007f";
+      ctx.fillStyle = "#ff007f";
+      ctx.lineWidth = 2.5;
+
+      // Posisi dasar Kunci G berpusat di garis ke-2 (G4)
+      const line2Y = staffTop + (lineSpacing * 3); 
+
+      ctx.beginPath();
+      // Melingkar di Garis G (Garis kedua dari bawah)
+      ctx.arc(x + 14, line2Y - 3, 11, 0.2 * Math.PI, 1.8 * Math.PI, false);
+      // Naik memanjang ke atas paranada
+      ctx.bezierCurveTo(x + 30, line2Y - 35, x + 8, staffTop - 35, x + 10, staffTop - 45);
+      ctx.bezierCurveTo(x + 12, staffTop - 55, x + 20, staffTop - 40, x + 15, staffTop - 20);
+      // Turun lurus melewati dasar paranada
+      ctx.lineTo(x + 12, line2Y + 30);
+      // Ekor melengkung bawah
+      ctx.arc(x + 6, line2Y + 30, 6, 0, Math.PI, false);
+      ctx.stroke();
+
+      // Titik bulatan kepala Kunci G
+      ctx.beginPath();
+      ctx.arc(x + 14, line2Y - 3, 3, 0, Math.PI * 2);
+      ctx.arc(x + 6, line2Y + 30, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
     }
 
     function drawStaff() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const lineSpacing = 16;
+      const lineSpacing = 18;
       const centerY = canvas.height / 2;
       const staffTop = centerY - (lineSpacing * 2);
 
@@ -288,23 +312,21 @@
         ctx.stroke();
       }
 
-      // Gambar Kunci G Sederhana
-      ctx.fillStyle = "#ff007f";
-      ctx.font = "bold 38px sans-serif";
-      ctx.fillText("🎼", 10, centerY + 12);
+      // GAMBAR KUNCI G STANDAR INTERNASIONAL
+      drawTrebleClef(ctx, 15, lineSpacing, staffTop);
 
       // Gambar Lingkaran Target Hit Zone
       ctx.strokeStyle = "#00f0ff";
       ctx.lineWidth = 3;
       ctx.setLineDash([6, 4]);
       ctx.beginPath();
-      ctx.arc(hitZoneX, centerY, 28, 0, Math.PI * 2);
+      ctx.arc(hitZoneX, centerY, 30, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
 
       ctx.fillStyle = "#00f0ff";
-      ctx.font = "10px sans-serif";
-      ctx.fillText("TARGET TAP", hitZoneX - 28, centerY + 42);
+      ctx.font = "bold 11px sans-serif";
+      ctx.fillText("TARGET TAP", hitZoneX - 32, centerY + 46);
 
       // Gambar Not Balok yang Sedang Berjalan
       const now = performance.now();
@@ -315,50 +337,46 @@
 
       for (let i = activeNotes.length - 1; i >= 0; i--) {
         let n = activeNotes[i];
-        n.x += NOTE_SPEED; // Kecepatan lambat & santai
+        n.x += NOTE_SPEED;
 
-        // Hitung Y berdasarkan Step Not
         let noteY = (staffTop + (lineSpacing * 4)) - (n.noteData.step * (lineSpacing / 2));
 
         if (n.status === "active") {
-          // Gambar Not Balok 2 Ketuk (Lingkaran Putih dengan Garis Tangkai)
+          // Not Balok 2 Ketuk (Lingkaran Putih + Tangkai)
           ctx.strokeStyle = "#ffffff";
           ctx.fillStyle = "#151221";
           ctx.lineWidth = 3;
           
           ctx.beginPath();
-          ctx.arc(n.x, noteY, 9, 0, Math.PI * 2);
+          ctx.arc(n.x, noteY, 10, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
 
-          // Garis Tangkai Not
+          // Garis Tangkai
           ctx.beginPath();
-          ctx.moveTo(n.x + 8, noteY);
-          ctx.lineTo(n.x + 8, noteY - 25);
+          ctx.moveTo(n.x + 9, noteY);
+          ctx.lineTo(n.x + 9, noteY - 28);
           ctx.stroke();
 
-          // Garis Bantu Tambahan (misal C4 / A5 ke atas)
-          if (n.noteData.step === 0) { // C4
+          // Garis Bantu Tambahan (C4)
+          if (n.noteData.step === 0) {
             ctx.beginPath();
-            ctx.moveTo(n.x - 14, noteY);
-            ctx.lineTo(n.x + 14, noteY);
+            ctx.moveTo(n.x - 16, noteY);
+            ctx.lineTo(n.x + 16, noteY);
             ctx.stroke();
           }
 
-          // Cek Jika Melewati Hit Zone Tanpa Di-tap
-          if (n.x > hitZoneX + 50) {
+          if (n.x > hitZoneX + 55) {
             n.status = "missed";
           }
         } else if (n.status === "hit") {
-          // Efek Kena -> Lingkaran Hijau
           ctx.fillStyle = "#10b981";
           ctx.beginPath();
-          ctx.arc(n.x, noteY, 12, 0, Math.PI * 2);
+          ctx.arc(n.x, noteY, 13, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Hapus not yang sudah lewat keluar layar
-        if (n.x > canvas.width + 30) {
+        if (n.x > canvas.width + 40) {
           activeNotes.splice(i, 1);
         }
       }
@@ -388,7 +406,6 @@
       drawStaff();
     }
 
-    // ANTI-CHEAT DETEKSI TAB/WINDOW
     document.addEventListener("visibilitychange", function() {
       if (document.hidden && gameRunning) handleCheatViolation("Terdeteksi meninggalkan tab!");
     });
